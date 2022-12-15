@@ -1,8 +1,10 @@
 export interface dataPelanggan {
 	nama: string;
+	username: string;
 	gender: string;
 	phone: string;
 	email: string;
+	tanggal_lahir: string;
 	alamat: {
 		baris_1: string;
 		baris_2: string;
@@ -13,5 +15,5 @@ export interface dataPelanggan {
 	photo: string;
 	photo_link: string;
 	desc: string;
-	user_id:string; // ini kalo terhubung dengan user yang bisa login sendiri
+	user_id: string; // ini kalo terhubung dengan user yang bisa login sendiri
 }
