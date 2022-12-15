@@ -24,6 +24,7 @@ const auth = getAuth();
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// Pengaturan session feedback success atau error
 export const getUser = () => {
 	const user = auth.currentUser;
 	// if (user !== null) {
@@ -72,10 +73,10 @@ export const addCustomer = async (data: dataPelanggan) => {
 			},
 			photo: data.photo,
 			photo_link: data.photo_link,
-			desc: data.desc
+			desc: data.desc,
+			user_id: data.user_id
 		});
 		console.log('Document written with ID: ', docRef.id);
-
 		return docRef.id;
 	} catch (e) {
 		console.error('Error adding document: ', e);
@@ -83,7 +84,7 @@ export const addCustomer = async (data: dataPelanggan) => {
 };
 
 // Upload Profile Picture disini
-export const uploadImageToFirebaseStorage = (
+export const uploadImageToFirebaseStorage = async (
 	file: any,
 	path_and_name: string,
 	updateFirestore: boolean,
@@ -102,7 +103,7 @@ export const uploadImageToFirebaseStorage = (
 	const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
 	// Listen for state changes, errors, and completion of the upload.
-	const result = uploadTask.on(
+	uploadTask.on(
 		'state_changed',
 		(snapshot) => {
 			// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -145,8 +146,6 @@ export const uploadImageToFirebaseStorage = (
 			});
 		}
 	);
-
-	return result;
 };
 
 export const updateCustomerPhoto = async (id: string, filename: string, imageurl: any) => {
@@ -156,7 +155,7 @@ export const updateCustomerPhoto = async (id: string, filename: string, imageurl
 		photo: filename,
 		photo_link: imageurl
 	});
-	return ' Profile Picture pelanggan ini telah diupdate!';
+	// return ' Profile Picture pelanggan ini telah diupdate!';
 };
 
 export const getCustomerFromFirestore = async (id: string) => {

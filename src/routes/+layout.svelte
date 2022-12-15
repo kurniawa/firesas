@@ -4,7 +4,7 @@
 	import { initializeApp } from 'firebase/app';
 	import { getAuth, onAuthStateChanged } from 'firebase/auth';
 	import { getAnalytics } from 'firebase/analytics';
-	import { firebaseConfig } from './../../src/auth/firebase.config';
+	import { firebaseConfig } from './../auth/firebase.config';
 	import { onMount } from 'svelte';
 	import { logout } from './../auth/authStores';
 	// TODO: Add SDKs for Firebase products that you want to use
@@ -17,6 +17,8 @@
 		const app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 		const auth = getAuth();
+		sessionStorage.setItem('success_logs', '');
+		sessionStorage.setItem('danger_logs', '');
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
 				// User is signed in, see docs for a list of available properties

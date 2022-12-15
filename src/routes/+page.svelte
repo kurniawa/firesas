@@ -14,7 +14,7 @@
 			// ...
 			// console.log(user.displayName);
 			displayName = user.displayName;
-			console.log('is_admin:', admin_ids.includes(user.uid));
+			// console.log('is_admin:', admin_ids.includes(user.uid));
 		} else {
 			// User is signed out
 			// ...
