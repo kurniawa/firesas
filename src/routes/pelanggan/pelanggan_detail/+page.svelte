@@ -24,6 +24,8 @@
 		},
 		photo: '',
 		photo_link: '',
+		photo_id: '',
+		photo_id_link: '',
 		desc: '',
 		user_id: ''
 	};
@@ -53,6 +55,8 @@
 						pelanggan.alamat = result.alamat;
 						pelanggan.photo = result.photo;
 						pelanggan.photo_link = result.photo_link;
+						pelanggan.photo_id = result.photo_id;
+						pelanggan.photo_id_link = result.photo_id_link;
 						pelanggan.desc = result.desc;
 					} else {
 						showPage = false;
@@ -71,6 +75,11 @@
 			// hapus dulu apabila ada data di storage
 			if (pelanggan.photo !== '') {
 				deleteFileFromStorage(`profile_pictures/${pelanggan.photo}`).then((result) => {
+					danger_logs += ` ${result}`;
+				});
+			}
+			if (pelanggan.photo_id !== '') {
+				deleteFileFromStorage(`id_photos/${pelanggan.photo_id}`).then((result) => {
 					danger_logs += ` ${result}`;
 				});
 			}
@@ -113,8 +122,7 @@
 			<div on:click={closeDD} on:keyup={closeDD} class="absolute w-full -top-2 -bottom-56 z-30" />
 			<ul class="bg-white shadow drop-shadow rounded absolute z-50 top-6 left-2">
 				<li>
-					<button
-						on:click={hapusPelanggan}
+					<a href="/pelanggan/pelanggan_edit?id={pelanggan_id}"
 						class="h-12 px-5 hover:bg-slate-100 flex items-center border-b w-full"
 					>
 						<svg
@@ -133,7 +141,7 @@
 						</svg>
 
 						<span class="ml-3">Edit</span>
-					</button>
+					</a>
 				</li>
 				<li>
 					<button

@@ -88,6 +88,7 @@ export const uploadImageToFirebaseStorage = async (
 	file: any,
 	path_and_name: string,
 	updateFirestore: boolean,
+	fieldName: string,
 	id: string,
 	filename: string
 ) => {
@@ -141,7 +142,14 @@ export const uploadImageToFirebaseStorage = async (
 			getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
 				console.log('File available at', downloadURL);
 				if (updateFirestore) {
-					updateCustomerPhoto(id, filename, downloadURL);
+					if (fieldName==='photo') {
+						updateCustomerPhoto(id, filename, downloadURL);
+						
+					} else if (fieldName==='photo_id') {
+						updateCustomerPhotoID(id, filename, downloadURL);
+						
+					}
+
 				}
 			});
 		}
@@ -155,7 +163,15 @@ export const updateCustomerPhoto = async (id: string, filename: string, imageurl
 		photo: filename,
 		photo_link: imageurl
 	});
-	// return ' Profile Picture pelanggan ini telah diupdate!';
+};
+
+export const updateCustomerPhotoID = async (id: string, filename: string, imageurl: any) => {
+	const customerRef = doc(db, 'customers', id);
+
+	await updateDoc(customerRef, {
+		photo_id: filename,
+		photo_id_link: imageurl
+	});
 };
 
 export const getCustomerFromFirestore = async (id: string) => {
