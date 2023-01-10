@@ -1,28 +1,28 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import type { dataPelanggan } from 'src/interfaces/Customer';
 	import { afterUpdate, onMount } from 'svelte';
 	import {
 		addCustomer,
+		getCustomerFromFirestore,
 		updateCustomerPhoto,
 		uploadImageToFirebaseStorage
 	} from './../../../auth/authStores';
 	import loading_gif from '$lib/assets/Wedges-3s-200px.gif';
-	import { Timestamp } from 'firebase/firestore';
-	let form: dataPelanggan = {
-		nama: '',
+	let pelanggan: dataPelanggan={
+        nama: '',
 		username: '',
 		gender: '',
 		phone: '',
 		email: '',
-		tanggal_lahir: Timestamp.fromDate(new Date()),
+		tanggal_lahir: '',
 		alamat: {
 			baris_1: '',
 			baris_2: '',
 			provinsi: '',
 			kota: '',
-			kodepos: '',
-			daerah: ''
+			kodepos: ''
 		},
 		photo: '',
 		photo_link: '',
@@ -30,7 +30,7 @@
 		photo_id_link: '',
 		desc: '',
 		user_id: ''
-	};
+    };
 
 	let invalid_feedback = '';
 	let disableTambahPelanggan = false;
@@ -56,17 +56,46 @@
 		danger_logs = verify_danger_logs !== null ? verify_danger_logs : '';
 		console.log('masuk ke getSession');
 	};
-	
+
+    const isPelangganIDExist = $page.url.searchParams.has('id'); // return true or false
+	let pelanggan_id: string | null;
+	let showPage = true;
+	if (isPelangganIDExist) {
+		pelanggan_id = $page.url.searchParams.get('id');
+		// console.log(pelanggan_id);
+		if (pelanggan_id !== null) {
+			getCustomerFromFirestore(pelanggan_id)
+				.then((result) => {
+					if (result) {
+						pelanggan.nama = result.nama;
+						pelanggan.gender = result.gender;
+						pelanggan.phone = result.phone;
+						pelanggan.email = result.email;
+						pelanggan.tanggal_lahir = result.tanggal_lahir;
+						pelanggan.alamat = result.alamat;
+						pelanggan.photo = result.photo;
+						pelanggan.photo_link = result.photo_link;
+						pelanggan.desc = result.desc;
+					} else {
+						showPage = false;
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+					showPage = false;
+				});
+		}
+	}
+
 	let file_input: any;
 	let image_file: any;
-	let avatar_foto: any;
 	const onFileSelected = (e: any) => {
 		let image = e.target.files[0];
 		let reader = new FileReader();
 		reader.readAsDataURL(image);
 		reader.onload = (e) => {
+			//  avatar = e.target.result
 			if (e.target !== null) {
-				avatar_foto = e.target.result
 				// console.log(e.target.result);
 				// image_file = e.target.result;
 			}
@@ -75,32 +104,10 @@
 		// console.log(image_file);
 		// console.log(image_file.type);
 	};
-	
-	let foto_id_input: any;
-	let foto_id_file: any;
-	let avatar_id: any;
-	const onFotoIDSelected = (e: any) => {
-		let image = e.target.files[0];
-		let reader = new FileReader();
-		reader.readAsDataURL(image);
-		reader.onload = (e) => {
-			if (e.target !== null) {
-				avatar_id = e.target.result
-				// console.log(e.target.result);
-				// image_file = e.target.result;
-			}
-		};
-		foto_id_file = image;
-		// console.log(image_file);
-		// console.log(image_file.type);
-	};
-
-	
-
-	function tambah_pelanggan() {
+	function edit_pelanggan() {
 		disableTambahPelanggan = true;
 		showLoadingAnimation = true;
-		addCustomer(form)
+		addCustomer(pelanggan)
 			.then((new_pelanggan_id) => {
 				// console.log('new_pelanggan_id:', new_pelanggan_id);
 				success_logs += 'Pelanggan baru berhasil didaftarkan!';
@@ -111,7 +118,7 @@
 					// get extension from filename
 					// source: https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
 					var fileExt = image_file.name.split('.').pop();
-					let filename = 'PP-' + new Date().getTime().toString() + `-${new_pelanggan_id}.${fileExt}`;
+					let filename = `${new_pelanggan_id}-` + new Date().getTime().toString() + `.${fileExt}`;
 					// console.log(filename);
 					if (typeof new_pelanggan_id !== 'undefined') {
 						uploadImageToFirebaseStorage(
@@ -133,28 +140,6 @@
 					// }
 					// balik lagi kembali update
 				}
-				if (typeof foto_id_file !== 'undefined') {
-					// console.log('not undefined');
-
-					// get extension from filename
-					// source: https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
-					var fileExt = foto_id_file.name.split('.').pop();
-					let filename = 'ID-' + new Date().getTime().toString() + `-${new_pelanggan_id}.${fileExt}`;
-					// console.log(filename);
-					if (typeof new_pelanggan_id !== 'undefined') {
-						uploadImageToFirebaseStorage(
-							foto_id_file,
-							`id_photos/${filename}`,
-							true,'photo_id',
-							new_pelanggan_id,
-							filename
-						).finally(() => {
-							success_logs +=
-								'Foto ID berhasil disimpan di storage. Data Pelanggan Link Photo-ID berhasil diupdate!';
-							sessionStorage.setItem('success_logs', success_logs);
-						});
-					}
-				}
 			})
 			.catch((error) => {
 				console.log(error);
@@ -163,15 +148,18 @@
 				getSession();
 				showLoadingAnimation = false;
 				setTimeout(() => {
-					routeToPage('/pelanggan', true);
-				}, 5000);
+					routeToPage(`/pelanggan/pelanggan_detail?id=${pelanggan_id}`, true);
+				}, 3000);
 			});
+		// console.log(image_file);
 	}
 
 	function routeToPage(route: string, replaceState: boolean) {
 		// goto(`/${route}`, { replaceState })
 		goto(route);
 	}
+
+    
 </script>
 
 <div class="relative">
@@ -187,33 +175,23 @@
 	<div class="m-3">
 		<div class="inline-block rounded p-2 bg-white shadow drop-shadow">
 			<div class="flex items-center">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="w-6 h-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
-					/>
-				</svg>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                  
 
-				<h3 class="ml-1">Tambah Pelanggan</h3>
+				<h3 class="ml-1">Edit Pelanggan</h3>
 			</div>
 		</div>
 
 		<form
-			on:submit|preventDefault={tambah_pelanggan}
+			on:submit|preventDefault={edit_pelanggan}
 			class="p-5 border rounded bg-white shadow drop-shadow mt-5"
 		>
 			<div class="">
 				<label for="displayName">Nama :</label>
 				<input
-					bind:value={form.nama}
+					bind:value={pelanggan.nama}
 					type="text"
 					id="displayName"
 					placeholder="Raffi Ahmad"
@@ -225,7 +203,7 @@
 			<div class="mt-3">
 				<label for="username">Username :</label>
 				<input
-					bind:value={form.username}
+					bind:value={pelanggan.username}
 					type="text"
 					id="username"
 					placeholder="Raffi Ahmad"
@@ -237,10 +215,10 @@
 			<div class="mt-3">
 				<label for="gender" class="block">Gender :</label>
 				<div class="flex items-center">
-					<input bind:group={form.gender} type="radio" name="gender" id="pria" value={'pria'} />
+					<input bind:group={pelanggan.gender} type="radio" name="gender" id="pria" value={'pria'} />
 					<label for="pria" class="ml-1">pria</label>
 					<input
-						bind:group={form.gender}
+						bind:group={pelanggan.gender}
 						type="radio"
 						name="gender"
 						id="wanita"
@@ -254,7 +232,7 @@
 			<div class="mt-3">
 				<label for="no_hp">No. HP :</label>
 				<input
-					bind:value={form.phone}
+					bind:value={pelanggan.phone}
 					type="text"
 					id="no_hp"
 					placeholder="0889 . . ."
@@ -266,7 +244,7 @@
 			<div class="mt-3">
 				<label for="email">Email :</label>
 				<input
-					bind:value={form.email}
+					bind:value={pelanggan.email}
 					type="email"
 					id="email"
 					placeholder="nagita@slavina.com"
@@ -278,21 +256,21 @@
 			<div class="p-2 border-4 border-indigo-200 rounded">
 				<label for="baris-1">Baris 1 :</label>
 				<input
-					bind:value={form.alamat.baris_1}
+					bind:value={pelanggan.alamat.baris_1}
 					type="text"
 					id="baris-1"
 					class="border border-slate-400 text-slate-700 shadow rounded w-full px-3 py-2 block placeholder:text-slate-400 focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-500 invalid:text-pink-700 invalid:focus:ring-pink-700;"
 				/>
 				<label for="baris-2">Baris 2 :</label>
 				<input
-					bind:value={form.alamat.baris_2}
+					bind:value={pelanggan.alamat.baris_2}
 					type="text"
 					id="baris-2"
 					class="border border-slate-400 text-slate-700 shadow rounded w-full px-3 py-2 block placeholder:text-slate-400 focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-500 invalid:text-pink-700 invalid:focus:ring-pink-700;"
 				/>
 				<label for="provinsi">Provinsi :</label>
 				<input
-					bind:value={form.alamat.provinsi}
+					bind:value={pelanggan.alamat.provinsi}
 					type="text"
 					id="provinsi"
 					class="border border-slate-400 text-slate-700 shadow rounded w-full px-3 py-2 block placeholder:text-slate-400 focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-500 invalid:text-pink-700 invalid:focus:ring-pink-700;"
@@ -301,7 +279,7 @@
 					<div>
 						<label for="kota">Kota :</label>
 						<input
-							bind:value={form.alamat.kota}
+							bind:value={pelanggan.alamat.kota}
 							type="text"
 							id="kota"
 							class="border border-slate-400 text-slate-700 shadow rounded w-full px-3 py-2 block placeholder:text-slate-400 focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-500 invalid:text-pink-700 invalid:focus:ring-pink-700;"
@@ -310,7 +288,7 @@
 					<div>
 						<label for="kodepos">Kodepos :</label>
 						<input
-							bind:value={form.alamat.kodepos}
+							bind:value={pelanggan.alamat.kodepos}
 							type="text"
 							id="kodepos"
 							class="border border-slate-400 text-slate-700 shadow rounded w-full px-3 py-2 block placeholder:text-slate-400 focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-500 invalid:text-pink-700 invalid:focus:ring-pink-700;"
@@ -325,17 +303,6 @@
 			{#if success_logs !== ''}
 				<div class="alert-success mt-2">{success_logs}</div>
 			{/if}
-
-			<!-- Foto Profile -->
-			{#if avatar_foto}
-			<div class="flex justify-center mt-3 py-3 border-2 border-pink-400 rounded">
-				<div class="w-2/3">
-					<img src="{avatar_foto}" alt="avatar_foto" />
-	
-				</div>
-
-			</div>
-        {/if}
 
 			<div class="text-center">
 				<div
@@ -368,10 +335,8 @@
 							/>
 						</svg>
 
-						<div class="ml-1">Foto Profile</div>
+						<div class="ml-1">Ganti Foto</div>
 					</div>
-
-					
 				</div>
 			</div>
 			<input
@@ -382,67 +347,17 @@
 				bind:this={file_input}
 			/>
 
-			<!-- Foto ID -->
-			{#if avatar_id}
-			<div class="flex justify-center mt-3 py-3 border-2 border-violet-400 rounded">
-				<div class="w-2/3">
-					<img src="{avatar_id}" alt="avatar_id" />
-	
-				</div>
-
-			</div>
-        {/if}
-
-			<div class="text-center">
-				<div
-					class="inline-block border-2 border-violet-400 rounded p-2 mt-2"
-					on:click={() => {
-						foto_id_input.click();
-					}}
-					on:keyup={() => {
-						foto_id_input.click();
-					}}
-				>
-					<div class="flex items-center">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							class="w-6 h-6"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
-							/>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
-							/>
-						</svg>
-
-						<div class="ml-1">Foto ID</div>
-					</div>
-
-					
-				</div>
-			</div>
-			<input
-				style="display:none"
-				type="file"
-				accept=".jpg, .jpeg, .png"
-				on:change={(e) => onFotoIDSelected(e)}
-				bind:this={foto_id_input}
-			/>
-
 			<div class="mt-3 text-center">
 				<button
 					type="submit"
-					class="bg-emerald-500 rounded text-white font-semibold w-full py-4 hover:bg-emerald-600 disabled:opacity-25"
-					disabled={disableTambahPelanggan}>+Tambah Pelanggan</button
+					class="bg-emerald-500 rounded text-white font-semibold w-full py-4 hover:bg-emerald-600 disabled:opacity-25 flex items-center justify-center"
+					disabled={disableTambahPelanggan}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                      
+                    <span class="ml-1">Konfirmasi Edit</span>
+                    </button
 				>
 			</div>
 		</form>

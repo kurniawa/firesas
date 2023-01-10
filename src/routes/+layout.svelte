@@ -17,8 +17,7 @@
 		const app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 		const auth = getAuth();
-		sessionStorage.setItem('success_logs', '');
-		sessionStorage.setItem('danger_logs', '');
+		
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
 				// User is signed in, see docs for a list of available properties

@@ -17,6 +17,8 @@ export interface dataPelanggan {
 	};
 	photo: string;
 	photo_link: string;
+	photo_id: string;
+	photo_id_link: string;
 	desc: string;
 	user_id: string; // ini kalo terhubung dengan user yang bisa login sendiri
 }
