@@ -145,7 +145,7 @@
 						</svg>
 
 						<span class="ml-3">Edit</span>
-					</a>
+					</button>
 				</li>
 				<li>
 					<button
