@@ -22,7 +22,7 @@
 			displayName = '';
 		}
 	});
-	let menus = ['Pembelian', 'Buyback', 'Pelanggan'];
+	let menus = ['Pembelian', 'Buyback', 'Pelanggan', 'Stock_Items'];
 </script>
 
 <svelte:head>

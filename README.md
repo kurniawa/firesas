@@ -1,3 +1,22 @@
+# Aplikasi POS(Point of Sales) Untuk Toko Emas Perhiasan
+
+## Data Item
+
+Jenis-jenis item:
+
+1. Perhiasan:(16)
+   - Anting
+   - Giwang
+   - Cincin
+   - Kalung
+   - Gelang:
+     - Rantai
+     - Kroncong
+     - Kaki
+   - Liontin
+2. LM
+3. Kotak Perhiasan
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).

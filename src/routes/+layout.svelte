@@ -82,7 +82,6 @@
 						<button
 							on:click={logout}
 							on:click={() => (showDotMenu = false)}
-							href="/login"
 							class="flex items-center h-11 w-48 px-5 hover:bg-slate-100 rounded-b"
 						>
 							<svg

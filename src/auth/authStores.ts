@@ -9,7 +9,8 @@ import {
 	getDoc,
 	doc,
 	updateDoc,
-	deleteDoc
+	deleteDoc,
+	Timestamp
 } from 'firebase/firestore';
 import {
 	deleteObject,
@@ -23,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 const storage = getStorage(app);
-
+const not_allowed_chars = '!`$%^&*()=[];/{}|:<>?';
 // Pengaturan session feedback success atau error
 export const getUser = () => {
 	const user = auth.currentUser;
@@ -61,7 +62,9 @@ export const addCustomer = async (data: dataPelanggan) => {
 	try {
 		const docRef = await addDoc(collection(db, 'customers'), {
 			nama: data.nama,
+			username: data.username,
 			gender: data.gender,
+			tanggal_lahir: data.tanggal_lahir,
 			phone: data.phone,
 			email: data.email,
 			alamat: {
@@ -69,7 +72,8 @@ export const addCustomer = async (data: dataPelanggan) => {
 				baris_2: data.alamat.baris_2,
 				provinsi: data.alamat.provinsi,
 				kota: data.alamat.kota,
-				kodepos: data.alamat.kodepos
+				kodepos: data.alamat.kodepos,
+				daerah: data.alamat.daerah
 			},
 			photo: data.photo,
 			photo_link: data.photo_link,
@@ -194,6 +198,140 @@ export const deleteFileFromStorage = async (file_path: string) => {
 			console.log(error);
 		});
 	return result;
+};
+
+export const updateUsernameOfCustomer = async (id: string, username: string) => {
+	const customerRef = doc(db, 'customers', id);
+	// console.log('customerRef:');
+	// console.log(customerRef);
+	// console.log('id:');
+	// console.log(id);
+	for (let i = 0; i < username.length; i++) {
+		if (not_allowed_chars.indexOf(username.charAt(i)) != -1) {
+			return { updating: 'username', status: 400, message: 'Invalid Username!' };
+		}
+	}
+	const res = await updateDoc(customerRef, {
+		username: username
+	})
+		.then(() => {
+			return { updating: 'username', status: 200, message: 'Username berhasil diupdate!' };
+		})
+		.catch((err) => {
+			console.log(err);
+			return {
+				updating: 'username',
+				status: 400,
+				message: 'Terdapat error pada proses update username!'
+			};
+		});
+
+	return res;
+	// return ' Profile Picture pelanggan ini telah diupdate!';
+};
+
+export const updateDataOfCustomer = async (
+	id: string,
+	nama: string,
+	gender: string,
+	tanggal_lahir: string,
+	email: string,
+	phone: string,
+	alamat_baris_1: string,
+	alamat_baris_2: string,
+	kota: string,
+	provinsi: string,
+	kodepos: string,
+	daerah: string,
+	desc: string
+) => {
+	const customerRef = doc(db, 'customers', id);
+	// console.log('customerRef:');
+	// console.log(customerRef);
+	// console.log('id:');
+	// console.log(id);
+	// console.log(tanggal_lahir);
+	// console.log(daerah);
+	// return { updating: 'data_user', status: 400, message: 'test return' };
+	for (let i = 0; i < nama.length; i++) {
+		if (not_allowed_chars.indexOf(nama.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid nama!' };
+		}
+	}
+	for (let i = 0; i < email.length; i++) {
+		if (not_allowed_chars.indexOf(email.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid email!' };
+		}
+	}
+	for (let i = 0; i < phone.length; i++) {
+		if (not_allowed_chars.indexOf(phone.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid phone!' };
+		}
+	}
+	for (let i = 0; i < alamat_baris_1.length; i++) {
+		if (not_allowed_chars.indexOf(alamat_baris_1.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < alamat_baris_2.length; i++) {
+		if (not_allowed_chars.indexOf(alamat_baris_2.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < kota.length; i++) {
+		if (not_allowed_chars.indexOf(kota.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < provinsi.length; i++) {
+		if (not_allowed_chars.indexOf(provinsi.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < kodepos.length; i++) {
+		if (not_allowed_chars.indexOf(kodepos.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < daerah.length; i++) {
+		if (not_allowed_chars.indexOf(daerah.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid alamat!' };
+		}
+	}
+	for (let i = 0; i < desc.length; i++) {
+		if (not_allowed_chars.indexOf(desc.charAt(i)) != -1) {
+			return { updating: 'data_user', status: 400, message: 'Invalid description!' };
+		}
+	}
+	const res = await updateDoc(customerRef, {
+		gender: gender,
+		tanggal_lahir: new Date(tanggal_lahir),
+		email: email,
+		phone: phone,
+		alamat: {
+			baris_1: alamat_baris_1,
+			baris_2: alamat_baris_2,
+			kota: kota,
+			provinsi: provinsi,
+			daerah: daerah,
+			kodepos: kodepos
+		},
+		desc: desc
+	})
+		.then(() => {
+			return { updating: 'data_user', status: 200, message: 'Data user berhasil diupdate!' };
+		})
+		.catch((err) => {
+			console.log(err);
+			return {
+				updating: 'data_user',
+				status: 400,
+				message: 'Terdapat error pada proses update data_user!'
+			};
+		});
+
+	return res;
+	// return ' Profile Picture pelanggan ini telah diupdate!';
 };
 
 export const admin_ids = ['B5hrh2ZsjZTTsv2LpH7T15116fG3'];

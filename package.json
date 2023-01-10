@@ -37,6 +37,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"firebase": "^9.15.0"
+		"firebase": "^9.15.0",
+		"jsbarcode": "^3.11.5"
 	}
 }

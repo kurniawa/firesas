@@ -8,19 +8,21 @@
 		uploadImageToFirebaseStorage
 	} from './../../../auth/authStores';
 	import loading_gif from '$lib/assets/Wedges-3s-200px.gif';
+	import { Timestamp } from 'firebase/firestore';
 	let form: dataPelanggan = {
 		nama: '',
 		username: '',
 		gender: '',
 		phone: '',
 		email: '',
-		tanggal_lahir: '',
+		tanggal_lahir: Timestamp.fromDate(new Date()),
 		alamat: {
 			baris_1: '',
 			baris_2: '',
 			provinsi: '',
 			kota: '',
-			kodepos: ''
+			kodepos: '',
+			daerah: ''
 		},
 		photo: '',
 		photo_link: '',

@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { Timestamp } from 'firebase/firestore';
 	import type { dataPelanggan } from 'src/interfaces/Customer';
 	import { onMount } from 'svelte';
 	import {
@@ -14,13 +16,14 @@
 		gender: '',
 		phone: '',
 		email: '',
-		tanggal_lahir: '',
+		tanggal_lahir: Timestamp.fromDate(new Date()),
 		alamat: {
 			baris_1: '',
 			baris_2: '',
 			provinsi: '',
 			kota: '',
-			kodepos: ''
+			kodepos: '',
+			daerah: ''
 		},
 		photo: '',
 		photo_link: '',
@@ -113,8 +116,8 @@
 			<div on:click={closeDD} on:keyup={closeDD} class="absolute w-full -top-2 -bottom-56 z-30" />
 			<ul class="bg-white shadow drop-shadow rounded absolute z-50 top-6 left-2">
 				<li>
-					<button
-						on:click={hapusPelanggan}
+					<a
+						href="/pelanggan/edit/{pelanggan_id}"
 						class="h-12 px-5 hover:bg-slate-100 flex items-center border-b w-full"
 					>
 						<svg
@@ -133,7 +136,7 @@
 						</svg>
 
 						<span class="ml-3">Edit</span>
-					</button>
+					</a>
 				</li>
 				<li>
 					<button
