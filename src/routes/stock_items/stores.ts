@@ -27,6 +27,8 @@ export const stock_ats = [
 		kategori: 'perhiasan',
 		kode: '',
 		mata: [{ jumlah: 1, warna: 'putih' }],
+		mainan: [{ jumlah: 1, nama: 'Hello Kitty' }],
+		nampan: 'N',
 		nama: 'Anting Jepit mata putih-1 35% 1.2g',
 		nama_short: 'AT Jp mp1 ku.35 n 1.2g',
 		photo_file: '',
@@ -52,6 +54,29 @@ export const stock_ccs = [
 		stok: 5,
 		tipe_emas: 'kuning',
 		tipe_perhiasan: 'cc'
+	}
+];
+
+export const stock_kls = [
+	{
+		doc_id: '51001',
+		berat: 3,
+		jenis: 'Milano',
+		kadar: 42,
+		kategori: 'perhiasan',
+		kode_barang: '75201101420003',
+		kode_perhiasan: 'bintang',
+		mata: [{ jumlah: 1, warna: 'putih' }],
+		mainan: [{ jumlah: 1, nama: 'Hello Kitty Warna Lonceng' }],
+		nampan: 'N',
+		panjang: 'JI',
+		nama: 'Kalung Milano+Liontin Fashion mp-full mainan Lonceng Hello Kitty Warna 42% 3g',
+		nama_short: 'KL Mil+Lion fash.mp-full ku.42 b 3g',
+		photo_file: '',
+		photo_link: '',
+		stok: 1,
+		tipe_emas: 'kuning',
+		tipe_perhiasan: 'KL'
 	}
 ];
 
@@ -103,6 +128,23 @@ export const tipe_perhiasan = [
 			{ nama: 'Wedding/Kawin', short: 'Wed' }
 		],
 		kode: 3,
+		nama: 'Cincin'
+	},
+	{
+		doc_id: 'KL',
+		jenis: [
+			{ nama: '1/2 Rante', short: '1/2R' },
+			{ nama: '1/2 Pasir', short: '1/2P' },
+			{ nama: 'Bambu Ukir', short: 'Bambuk' },
+			{ nama: 'Dubai', short: 'Dub.' },
+			{ nama: 'Listring Aurel', short: 'listr.Aurel' },
+			{ nama: 'Listring V', short: 'listr.V' },
+			{ nama: 'Patkok', short: 'Patk' },
+			{ nama: 'Ring Polos', short: 'r.Pol' },
+			{ nama: 'Stempel', short: 'Stp.' },
+			{ nama: 'Wedding/Kawin', short: 'Wed' }
+		],
+		kode: 5,
 		nama: 'Cincin'
 	}
 ];

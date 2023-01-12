@@ -5,16 +5,16 @@
 Jenis-jenis item:
 
 1. Perhiasan:(16)
-   - Anting
-   - Giwang
-   - Cincin
-   - Kalung
-   - Gelang:
-     - Rantai
-     - Kroncong
+   - Anting - 1
+   - Giwang - 2
+   - Cincin - 3
+   - Kalung - 5
+   - Gelang: - 6
+     - Rantai - 61
+     - Bulet -66
      - Kaki
-   - Liontin
-2. LM
+   - Liontin - 7
+2. LM - 8
 3. Kotak Perhiasan
 
 # create-svelte

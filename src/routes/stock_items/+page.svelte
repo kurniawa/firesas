@@ -100,7 +100,9 @@
 		});
 		JsBarcode('#barcode', '7110211013509901.2');
 		JsBarcode('#barcode2', '71401101420002-1');
-		JsBarcode('#barcode3', '721001421.2');
+		JsBarcode('#barcode3', '10001');
+		JsBarcode('#barcode4', '01234510015',{format:"upc"});
+		JsBarcode('#barcode5', '123456789012',{format:"upc",displayValue:false});
 	});
 
 	let item = {
@@ -143,6 +145,10 @@
 		<svg id="barcode" />
 		<svg id="barcode2" />
 		<svg id="barcode3" />
+		<svg id="barcode4" />
+		<svg id="barcode5" />
+		<svg id="barcode6" />
+		<svg id="barcode7" />
 		<button on:click={loopingTipePerhiasan} class="btn-danger rounded"
 			>Migrate Tipe Perhiasan</button
 		>
